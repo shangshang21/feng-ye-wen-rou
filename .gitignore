@@ -1,0 +1,6 @@
+node_modules/
+film/node_modules/
+film/dist/
+film/out/
+.DS_Store
+player/wind.js

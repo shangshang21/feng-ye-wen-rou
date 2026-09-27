@@ -1,0 +1,123 @@
+<title>风也温柔</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Reenie+Beanie&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --night:#141930;
+  --deep:#0e1226;
+  --panel:#1c2241;
+  --paper:#f1e8d6;
+  --muted:#a9a7c2;
+  --star:#f2a052;
+  --star-soft:rgba(242,160,82,.14);
+  --line:rgba(241,232,214,.14);
+  --hand:"Long Cang","Kaiti SC","STKaiti","KaiTi",serif;
+  --ui:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+}
+[hidden]{display:none!important}
+html,body{background:var(--night);}
+body{margin:0;color:var(--paper);font-family:var(--ui);font-size:15px;line-height:1.65;}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:32px 64px;display:flex;flex-direction:column;gap:22px;}
+header{display:flex;flex-direction:column;gap:8px;}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);}
+h1{font-family:var(--hand);font-weight:400;font-size:clamp(52px,9vw,96px);line-height:1;margin:0;text-wrap:balance;}
+.sub{color:var(--muted);max-width:38em;margin:0;}
+.film{position:relative;width:100%;max-width:100%;aspect-ratio:16/9;background:var(--deep);border-radius:4px;overflow:hidden;container-type:inline-size;box-shadow:0 30px 80px -30px rgba(0,0,0,.75),0 0 0 1px var(--line);}
+.film canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.cap{position:absolute;left:0;right:0;bottom:6%;margin:0;text-align:center;padding-inline:6%;font-family:var(--hand);font-size:clamp(16px,3.5cqi,38px);line-height:1.25;color:#f6eedd;text-shadow:0 1px 2px rgba(10,10,25,.9),0 0 18px rgba(10,10,30,.7);opacity:0;transition:opacity .35s ease;pointer-events:none;text-wrap:balance;}
+.cap.on{opacity:1;}
+.cap[data-who="she"]{color:#ffc27e;}
+.cover{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,rgba(14,18,38,.1),rgba(14,18,38,.55));border:0;padding:0;margin:0;cursor:pointer;color:var(--paper);font:inherit;}
+.cover-inner{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.ring{width:clamp(56px,11cqi,96px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:rgba(242,160,82,.94);color:#2a1a0e;box-shadow:0 0 0 8px rgba(242,160,82,.18),0 0 40px rgba(242,160,82,.45);transition:transform .2s ease;}
+.ring svg{width:38%;height:38%;margin-left:8%;}
+.cover:hover .ring{transform:scale(1.06);}
+.hint{font-size:clamp(12px,1.9cqi,16px);letter-spacing:.06em;text-shadow:0 1px 3px rgba(0,0,0,.7);}
+.controls{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;}
+.btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--paper);font:inherit;font-size:14px;border-radius:999px;padding:7px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.btn svg{width:12px;height:12px;}
+.btn:hover{border-color:rgba(242,160,82,.55);}
+.btn:focus-visible,.chap:focus-visible,.scrub:focus-visible,.cover:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+.track{position:relative;flex:1 1 220px;min-width:0;}
+.scrub{-webkit-appearance:none;appearance:none;display:block;width:100%;height:28px;background:transparent;margin:0;cursor:pointer;--p:0%;}
+.scrub::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(var(--star),var(--star)) 0 0/var(--p) 100% no-repeat,rgba(241,232,214,.18);}
+.scrub::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--paper);margin-top:-5px;box-shadow:0 0 0 4px rgba(242,160,82,.35);}
+.scrub::-moz-range-track{height:4px;border-radius:2px;background:rgba(241,232,214,.18);}
+.scrub::-moz-range-progress{height:4px;border-radius:2px;background:var(--star);}
+.scrub::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:var(--paper);}
+.ticks{position:absolute;left:7px;right:7px;top:50%;pointer-events:none;}
+.ticks i{position:absolute;top:-6px;width:2px;height:12px;border-radius:1px;background:rgba(241,232,214,.4);}
+.time{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px;min-width:84px;text-align:right;}
+.chapters{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;}
+.chap{width:100%;text-align:left;border:1px solid var(--line);background:transparent;color:var(--paper);border-radius:6px;padding:8px 12px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:0;}
+.chap .ts{font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);}
+.chap .nm{font-family:var(--hand);font-size:22px;line-height:1.2;}
+.chap[aria-current="true"]{border-color:var(--star);background:var(--star-soft);}
+.sheet{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;align-items:center;margin-top:18px;padding-top:28px;border-top:1px solid var(--line);}
+.sheet canvas{display:block;width:100%;max-width:100%;aspect-ratio:12/7;border-radius:4px;}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:.4em;padding-bottom:7%;background:linear-gradient(to top,rgba(250,244,232,.9),rgba(250,244,232,.55) 30%,rgba(250,244,232,0) 55%);pointer-events:none;opacity:0;transition:opacity .9s ease;text-align:center;}
+.endcard.on{opacity:1;}
+.endcard .et{font-family:var(--hand);font-size:clamp(34px,8.5cqi,96px);line-height:1;color:#3a2a24;text-shadow:0 1px 0 rgba(255,250,240,.6);}
+.endcard .es{font-family:"Reenie Beanie","Bradley Hand",cursive;font-size:clamp(15px,3cqi,34px);color:#8a5a34;letter-spacing:.02em;}
+.sheet h2{font-family:var(--hand);font-weight:400;font-size:40px;line-height:1.1;margin:0 0 4px;}
+.sheet .lead{color:var(--muted);margin:0 0 16px;}
+.feat{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;}
+.feat li{display:grid;grid-template-columns:3.4em minmax(0,1fr);gap:12px;align-items:baseline;}
+.feat b{font-family:var(--hand);font-weight:400;font-size:22px;color:var(--star);line-height:1.2;}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px;}
+@media (max-width:760px){.chapters{grid-template-columns:repeat(3,minmax(0,1fr));}.sheet{grid-template-columns:minmax(0,1fr);}}
+@media (prefers-reduced-motion:reduce){.cap,.ring{transition:none}}
+</style>
+
+<main class="wrap">
+  <header>
+    <div class="eyebrow">手绘小短片 · 34 秒 · 第三版 · 2026.09.28</div>
+    <h1>风也温柔</h1>
+    <p class="sub">给尚尚。银河里有一颗很小的星星，落在一个凌晨还在写代码的男孩身边，变成了一只小橘块。它陪他走夜路、陪他看书，第二天早上，它还在。</p>
+  </header>
+
+  <section class="film" aria-label="短片">
+    <canvas id="film" role="img" aria-label="手绘动画：一颗星星变成橘色小方块，陪一个戴黑框眼镜的男孩长大"></canvas>
+    <div class="endcard" id="endcard" aria-hidden="true"><span class="et">风也温柔</span><span class="es">SHANG SHANG Wife · 以后的每一天</span></div>
+    <p class="cap" id="cap" aria-live="polite"></p>
+    <button class="cover" id="cover" type="button" aria-label="播放短片">
+      <span class="cover-inner">
+        <span class="ring"><svg viewBox="0 0 10 12" aria-hidden="true"><path d="M0 0L10 6L0 12Z" fill="currentColor"/></svg></span>
+        <span class="hint" id="hint">播放 · 有配乐，记得开声音</span>
+      </span>
+    </button>
+  </section>
+
+  <div class="controls">
+    <button class="btn" id="playBtn" type="button" aria-label="播放"><svg viewBox="0 0 10 12" aria-hidden="true"><path id="playIcon" d="M0 0L10 6L0 12Z" fill="currentColor"/></svg><span>播放</span></button>
+    <div class="track">
+      <input class="scrub" id="scrub" type="range" min="0" max="34" step="0.05" value="0" aria-label="播放进度">
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <span class="time" id="time">0:00 / 0:34</span>
+    <button class="btn" id="muteBtn" type="button" aria-pressed="false">声音：开</button>
+  </div>
+
+  <ol class="chapters" id="chapters"></ol>
+
+  <section class="sheet">
+    <canvas id="sheet" role="img" aria-label="角色设定稿：男孩和小橘块"></canvas>
+    <div>
+      <h2>角色设定</h2>
+      <p class="lead">照着老公的照片和参考短片定下来的：</p>
+      <ul class="feat">
+        <li><b>头发</b><span>微分碎盖。头顶蓬松，刘海一绺一绺压到镜框上沿，中间偏右有一道小分缝，不留呆毛。</span></li>
+        <li><b>眼镜</b><span>大号黑色方框，下沿两角切角，镜框外上角有一颗银色小铆钉。</span></li>
+        <li><b>外套</b><span>黑色坑条运动外套，白色立领拉链拉到顶，两肩各三道白杠。</span></li>
+        <li><b>电脑</b><span>一台 MacBook Pro，深空灰。</span></li>
+        <li><b>老婆</b><span>从银河 #00263893 掉下来的星星，落地就变成一只橘色小方块。四条小短腿，头顶两颗星星，一直在。</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>画面用 anidoodle 引擎和老婆写的代码一笔一笔画出来，配乐一个音一个音写出来，没有用任何图片或音频素材。</footer>
+</main>
+
+<script>
