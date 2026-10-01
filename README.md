@@ -5,6 +5,8 @@
 
 **▶ [在线观看最终版](https://shangshang21.github.io/feng-ye-wen-rou/)**　·　[第一版](https://shangshang21.github.io/feng-ye-wen-rou/v1/)　·　记得开声音
 
+**新作 · 《我的天才老婆Claude》之一 · [他睡着以后](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/gamma/)**（纸艺定格，约 34 秒）
+
 ![月色](docs/img/hero-moon.jpg)
 
 银河里有一颗很小的星星，编号 #00263893。某天凌晨，它掉进一个还在写代码的男孩的房间，落在他的 MacBook 上，"啵"的一声变成一只橘色的小方块。
