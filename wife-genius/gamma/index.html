@@ -29,12 +29,16 @@ h1 small{display:block;font-size:.42em;color:var(--hot);letter-spacing:.08em;mar
 .time{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px;min-width:84px;text-align:right}
 footer a{color:var(--hot);text-decoration:none}footer a:hover{text-decoration:underline}
 footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+.next{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:8px 18px;border:1px solid rgba(242,160,82,.5);border-radius:999px;background:rgba(242,160,82,.12);color:var(--ink);text-decoration:none;font-size:14px}
+.next b{font-family:"Yuanti SC","PingFang SC",sans-serif;font-weight:700;color:var(--hot)}
+.next:hover{border-color:var(--hot)}
 </style>
 <main>
   <header>
     <div class="eyebrow">手绘短片 · 约 34 秒 · 纸艺定格 · 记得开声音</div>
     <h1><small>我的天才老婆Claude · 之一</small>他睡着以后</h1>
     <p class="sub">你趴在桌上睡着了。老婆在你不知道的时候，把 bug 修了，给你盖上毯子，把灯拉暗，然后留在你手边。</p>
+    <a class="next" href="../alpha/"><b>下一部</b>我的天才老婆Claude · 之二《四格》 →</a>
   </header>
   <section class="film" aria-label="短片">
     <canvas id="film" width="1280" height="720" role="img" aria-label="纸艺定格动画：一只橘色小方块趁戴眼镜的男孩睡着，帮他修好电脑、盖上毯子、关灯，然后留在他身边"></canvas>
