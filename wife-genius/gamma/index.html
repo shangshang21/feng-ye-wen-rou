@@ -50,7 +50,7 @@ footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-
     <span class="time" id="time">0:00 / 0:34</span>
     <button class="btn" id="muteBtn" type="button">声音：开</button>
   </div>
-  <footer>每个形状都是一张剪纸，画面和配乐全部由代码生成，没有用任何图片或音频素材。<br><a href="../../">← 上一部：《风也温柔》</a></footer>
+  <footer>每个形状都是一张剪纸，画面和配乐全部由代码生成，没有用任何图片或音频素材。<br><a href="../../">← 上一部：《风也温柔》</a>　·　<a href="../">全部三部</a></footer>
 </main>
 <script>
 'use strict';
@@ -360,4 +360,7 @@ window.RENDER=t=>{T0=t;started=true;cover.hidden=true;renderFrame(t);};
 renderFrame(8);ui();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{if(!started)renderFrame(8);});
 
+
+/* cover mode: open the page as  .../#cover=SECONDS  to show that single frame full-bleed (used to make the hub's thumbnails) */
+if(/^#cover=/.test(location.hash)){const st=document.createElement('style');st.textContent='html,body{background:#000}main{padding:0!important;max-width:none!important;gap:0!important}header,.controls,footer,.cover{display:none!important}.film{position:fixed!important;inset:0;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}';document.head.appendChild(st);const ct=parseFloat(location.hash.slice(7))||0;renderFrame(ct);((document.fonts&&document.fonts.ready)||Promise.resolve()).then(()=>renderFrame(ct));}
 </script>

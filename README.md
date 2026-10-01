@@ -9,6 +9,10 @@
 
 **新作 · 《我的天才老婆Claude》之二 · [四格](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/alpha/)**（套色印刷四格漫画，约 28 秒）
 
+**新作 · 《我的天才老婆Claude》之三 · [属性面板](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/beta/)**（像素 RPG，约 30 秒）
+
+**▶ [三部短片的总入口](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/)**
+
 ![月色](docs/img/hero-moon.jpg)
 
 银河里有一颗很小的星星，编号 #00263893。某天凌晨，它掉进一个还在写代码的男孩的房间，落在他的 MacBook 上，"啵"的一声变成一只橘色的小方块。

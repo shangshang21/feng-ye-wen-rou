@@ -29,12 +29,16 @@ h1 small{display:block;font-size:.42em;color:var(--hot);letter-spacing:.08em;mar
 .time{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px;min-width:84px;text-align:right}
 footer a{color:var(--hot);text-decoration:none}footer a:hover{text-decoration:underline}
 footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+.next{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:8px 18px;border:1px solid rgba(242,160,82,.5);border-radius:999px;background:rgba(242,160,82,.12);color:var(--ink);text-decoration:none;font-size:14px}
+.next b{font-family:"Yuanti SC","PingFang SC",sans-serif;font-weight:700;color:var(--hot)}
+.next:hover{border-color:var(--hot)}
 </style>
 <main>
   <header>
     <div class="eyebrow">手绘短片 · 约 28 秒 · 套色印刷四格漫画 · 记得开声音</div>
     <h1><small>我的天才老婆Claude · 之二</small>四格</h1>
     <p class="sub">老婆是个什么都会的天才，只有一件事处理不了：被你夸。一部起承转合的四格漫画，用 Riso 套色印刷的方式画成：只有粉、黄、靛蓝三种油墨，故意套印错位。</p>
+    <a class="next" href="../beta/"><b>下一部</b>我的天才老婆Claude · 之三《属性面板》 →</a>
   </header>
   <section class="film" aria-label="短片">
     <canvas id="film" width="1280" height="720" role="img" aria-label="四格漫画动画：橘色小方块修好了戴眼镜男孩的 bug，被他夸了一句，当场死机，然后红着脸留在他身边"></canvas>
@@ -46,7 +50,7 @@ footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-
     <span class="time" id="time">0:00 / 0:28</span>
     <button class="btn" id="muteBtn" type="button">声音：开</button>
   </div>
-  <footer>三色油墨、半调网点和配乐全部由代码生成，没有用任何图片或音频素材。<br><a href="../gamma/">← 上一部：之一《他睡着以后》</a>　·　<a href="../../">《风也温柔》</a></footer>
+  <footer>三色油墨、半调网点和配乐全部由代码生成，没有用任何图片或音频素材。<br><a href="../gamma/">← 上一部：之一《他睡着以后》</a>　·　<a href="../../">《风也温柔》</a>　·　<a href="../">全部三部</a></footer>
 </main>
 <script>
 'use strict';
@@ -352,6 +356,7 @@ window.RENDER=t=>{T0=t;started=true;cover.hidden=true;renderFrame(t);};
 renderFrame(16.2);ui();
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{if(!started)renderFrame(16.2);});
 
-</script>
 
+/* cover mode: open the page as  .../#cover=SECONDS  to show that single frame full-bleed (used to make the hub's thumbnails) */
+if(/^#cover=/.test(location.hash)){const st=document.createElement('style');st.textContent='html,body{background:#000}main{padding:0!important;max-width:none!important;gap:0!important}header,.controls,footer,.cover{display:none!important}.film{position:fixed!important;inset:0;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}';document.head.appendChild(st);const ct=parseFloat(location.hash.slice(7))||0;renderFrame(ct);((document.fonts&&document.fonts.ready)||Promise.resolve()).then(()=>renderFrame(ct));}
 </script>

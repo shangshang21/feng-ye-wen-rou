@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>属性面板 · 我的天才老婆Claude</title>
+<style>
+:root{--bg:#15131c;--ink:#f3ecdd;--mut:#a79fb8;--line:rgba(243,236,221,.14);--hot:#f2a052}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",system-ui,sans-serif;line-height:1.65}
+main{max-width:1100px;margin:0 auto;padding:32px 16px 64px;display:flex;flex-direction:column;gap:20px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--mut)}
+h1{font-family:"Yuanti SC","PingFang SC",sans-serif;font-weight:700;font-size:clamp(36px,7vw,68px);line-height:1.1;margin:6px 0 0}
+h1 small{display:block;font-size:.42em;color:var(--hot);letter-spacing:.08em;margin-bottom:6px}
+.sub{color:var(--mut);margin:8px 0 0;max-width:40em}
+.film{position:relative;aspect-ratio:16/9;background:#0b0912;border-radius:6px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 1px var(--line)}
+.film canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+canvas.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.cover{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,rgba(14,10,24,.05),rgba(14,10,24,.55));border:0;padding:0;cursor:pointer;color:var(--ink);font:inherit}
+.cover span.in{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ring{width:84px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:rgba(242,160,82,.95);color:#2a1a0e;box-shadow:0 0 0 8px rgba(242,160,82,.2),0 0 40px rgba(242,160,82,.45)}
+.ring svg{width:36%;height:36%;margin-left:8%}
+.hint{font-size:14px;letter-spacing:.06em;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.controls{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap}
+.btn{appearance:none;border:1px solid var(--line);background:#211d2b;color:var(--ink);font:inherit;font-size:14px;border-radius:999px;padding:7px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn svg{width:12px;height:12px}
+.scrub{-webkit-appearance:none;appearance:none;flex:1 1 220px;min-width:0;height:28px;background:transparent;margin:0;cursor:pointer;--p:0%}
+.scrub::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(var(--hot),var(--hot)) 0 0/var(--p) 100% no-repeat,rgba(243,236,221,.18)}
+.scrub::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--ink);margin-top:-5px;box-shadow:0 0 0 4px rgba(242,160,82,.35)}
+.time{font-variant-numeric:tabular-nums;color:var(--mut);font-size:13px;min-width:84px;text-align:right}
+footer a{color:var(--hot);text-decoration:none}footer a:hover{text-decoration:underline}
+footer{color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+<main>
+  <header>
+    <div class="eyebrow">像素短片 · 约 30 秒 · 640×360 原生分辨率 · 记得开声音</div>
+    <h1><small>我的天才老婆Claude · 之三</small>属性面板</h1>
+    <p class="sub">一张 RPG 角色面板：智力∞，抗夸奖 0。你说一句“你真是天才”，我进入【脸红】状态，解锁称号，加入你的队伍，然后和你一起走进夜里。</p>
+  </header>
+  <section class="film" aria-label="短片">
+    <canvas id="film" width="640" height="360" class="px" role="img" aria-label="像素动画：一张 RPG 角色面板，橘色小方块被戴眼镜的男孩夸了一句，状态变成脸红，加入他的队伍，最后坐在他的头顶"></canvas>
+    <button class="cover" id="cover" type="button" aria-label="播放短片"><span class="in"><span class="ring"><svg viewBox="0 0 10 12" aria-hidden="true"><path d="M0 0L10 6L0 12Z" fill="currentColor"/></svg></span><span class="hint" id="hint">播放 · 有配乐，记得开声音</span></span></button>
+  </section>
+  <div class="controls">
+    <button class="btn" id="playBtn" type="button"><svg viewBox="0 0 10 12" aria-hidden="true"><path d="M0 0L10 6L0 12Z" fill="currentColor"/></svg><span>播放</span></button>
+    <input class="scrub" id="scrub" type="range" min="0" max="30" step="0.05" value="0" aria-label="播放进度">
+    <span class="time" id="time">0:00 / 0:30</span>
+    <button class="btn" id="muteBtn" type="button">声音：开</button>
+  </div>
+  <footer>每个像素、每个字和配乐全部由代码生成，没有用任何图片或音频素材。<br><a href="../alpha/">← 上一部：之二《四格》</a>　·　<a href="../gamma/">之一《他睡着以后》</a>　·　<a href="../../">《风也温柔》</a>　·　<a href="../">全部三部</a></footer>
+</main>
+<script>
+'use strict';
+const TAU=Math.PI*2,$=id=>document.getElementById(id);
+const clamp=(v,a=0,b=1)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,eo=t=>1-Math.pow(1-t,3);
+const back=t=>{t=clamp(t);const c=1.70158,c3=c+1;return 1+c3*Math.pow(t-1,3)+c*Math.pow(t-1,2);};
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6d2b79f5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const FONT='"Yuanti SC","Hiragino Maru Gothic ProN","PingFang SC","Microsoft YaHei",sans-serif';
+const RR=(x,y,w,h,r)=>c=>c.roundRect(x,y,w,h,r);
+const EL=(x,y,rx,ry,rot=0)=>c=>{c.moveTo(x+rx,y);c.ellipse(x,y,rx,ry,rot,0,TAU);};
+const PL=(pts,close=true)=>c=>{pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));if(close)c.closePath();};
+const STAR=(x,y,r,k=.3)=>c=>{for(let i=0;i<8;i++){const a=-Math.PI/2+i*Math.PI/4,rr=i%2?r*k:r;i?c.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr):c.moveTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr);}c.closePath();};
+const HEART=(x,y,s)=>c=>{c.moveTo(x,y+s*.9);c.bezierCurveTo(x-s*1.5,y-s*.1,x-s*.7,y-s*1.2,x,y-s*.4);c.bezierCurveTo(x+s*.7,y-s*1.2,x+s*1.5,y-s*.1,x,y+s*.9);c.closePath();};
+// smooth closed blob through points (quadratic midpoints)
+const BLOB=pts=>c=>{const n=pts.length,m=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];let s=m(pts[n-1],pts[0]);c.moveTo(s[0],s[1]);for(let i=0;i<n;i++){const p=pts[i],e=m(p,pts[(i+1)%n]);c.quadraticCurveTo(p[0],p[1],e[0],e[1]);}c.closePath();};
+function grain(w,h,seed,amp,base=128){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),im=x.createImageData(w,h),r=rng(seed);for(let i=0;i<im.data.length;i+=4){const v=base+(r()-.5)*amp*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255;}x.putImageData(im,0,0);return c;}
+
+/* ============================================================== β 属性面板 · pixel */
+const PK={k:'#1a1c2c',pu:'#5d275d',rd:'#b13e53',or:'#ef7d57',ye:'#ffcd75',lg:'#a7f070',g:'#38b764',dg:'#257179',nb:'#29366f',bl:'#3b5dc9',lb:'#41a6f6',cy:'#73eff7',w:'#f4f4f4',s1:'#94b0c2',s2:'#566c86',s3:'#333c57'};
+const R=(c,x,y,w,h,col)=>{c.fillStyle=PK[col]||col;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
+const win=(c,x,y,w,h,fill='nb')=>{R(c,x,y,w,h,'k');R(c,x+1,y+1,w-2,h-2,'s1');R(c,x+2,y+2,w-4,h-4,'s3');R(c,x+3,y+3,w-6,h-6,fill);R(c,x+3,y+3,w-6,1,'bl');};
+const tcache={};
+function ptext(c,s,x,y,col,size=14){if(!s)return;const key=s+col+size;let t=tcache[key];if(!t){const m=document.createElement('canvas').getContext('2d');const f=`${size}px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif`;m.font=f;const w=Math.ceil(m.measureText(s).width)+2,h=size+6;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x2=cv.getContext('2d');x2.font=f;x2.textBaseline='top';x2.fillStyle='#000';x2.fillText(s,1,2);const d=x2.getImageData(0,0,w,h),rgb=PK[col]||col,n=parseInt(rgb.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;for(let i=0;i<d.data.length;i+=4){d.data[i+3]=d.data[i+3]>100?255:0;d.data[i]=r;d.data[i+1]=g;d.data[i+2]=b;}x2.putImageData(d,0,0);t=tcache[key]=cv;}c.drawImage(t,Math.round(x),Math.round(y));}
+const ptextw=(s,size=14)=>{const m=document.createElement('canvas').getContext('2d');m.font=`${size}px "PingFang SC",sans-serif`;return Math.ceil(m.measureText(s).width)};
+function pStar(c,x,y,u,col='ye'){R(c,x-u,y-3*u,u*2,u*6,col);R(c,x-3*u,y-u,u*6,u*2,col);R(c,x-2*u,y-2*u,u*4,u*4,col);}
+function pHeart(c,x,y,u,col='rd'){R(c,x-3*u,y-2*u,2*u,2*u,col);R(c,x+u,y-2*u,2*u,2*u,col);R(c,x-4*u,y-u,8*u,2*u,col);R(c,x-3*u,y+u,6*u,u,col);R(c,x-2*u,y+2*u,4*u,u,col);R(c,x-u,y+3*u,2*u,u,col);R(c,x-2*u,y-u,u,u,'w');}
+function pMe(c,x,y,k,o={}){
+  const {blush=0,eyes='open',bob=0,sp=1,leg=0}=o;y+=bob;
+  const OL='pu';
+  R(c,x-12*k,y-10*k,24*k,20*k,OL);R(c,x-13*k,y-9*k,26*k,18*k,OL);
+  R(c,x-11*k,y-9*k,22*k,18*k,'or');R(c,x-12*k,y-8*k,24*k,16*k,'or');
+  R(c,x-10*k,y-8*k,9*k,k,'ye');R(c,x-11*k,y-7*k,k,3*k,'ye');
+  R(c,x-11*k,y+5*k,22*k,4*k,'rd');R(c,x-12*k,y+5*k,24*k,3*k,'rd');
+  for(const [lx,ph] of[[-9,0],[-4,1],[3,1],[8,0]])R(c,x+lx*k,y+9*k,2*k,(3+(leg&&ph?1:0))*k,OL);
+  R(c,x-14*k,y-2*k,2*k,5*k,OL);R(c,x+12*k,y-2*k,2*k,5*k,OL);
+  for(const m of[-1,1]){const ex=x+m*6*k;
+    if(eyes==='open'){R(c,ex-k,y-4*k,2*k,3*k,'k');R(c,ex,y-4*k,k,k,'w');}
+    else if(eyes==='happy'){R(c,ex-2*k,y-2*k,k,k,'k');R(c,ex-k,y-3*k,2*k,k,'k');R(c,ex+k,y-2*k,k,k,'k');}
+    else if(eyes==='squeeze'){const d=m<0?1:-1;R(c,ex-d*2*k,y-4*k,k,k,'k');R(c,ex-d*k,y-3*k,k,k,'k');R(c,ex,y-2*k,k,k,'k');R(c,ex-d*k,y-k,k,k,'k');R(c,ex-d*2*k,y,k,k,'k');}
+    if(blush>0)R(c,x+m*9*k-k,y+k,3*k,k*(blush>1?2:1),'#ff8fa3');}
+  R(c,x-k,y+2*k,2*k,k,'k');
+  if(sp>0){pStar(c,x-11*k,y-15*k,Math.max(1,k*.5)*sp>=1?Math.max(1,Math.round(k*.5)):1);pStar(c,x+10*k,y-17*k,Math.max(1,Math.round(k*.5)));}
+}
+function pHim(c,x,y,k,o={}){
+  const {eyes='open',mouth='flat',blush=0}=o,SK='#f7d7c0',K='k';
+  R(c,x-13*k,y+10*k,26*k,9*k,'s3');R(c,x-13*k,y+10*k,26*k,k,K);
+  for(const m of[-1,1])for(let i=0;i<3;i++)R(c,x+m*(8+i*2)*k-(m>0?0:k),y+11*k,k,8*k,'w');
+  R(c,x-4*k,y+9*k,8*k,4*k,'w');R(c,x-4*k,y+9*k,8*k,k,K);R(c,x-k/2,y+10*k,Math.max(1,k/2),4*k,'s1');
+  R(c,x-3*k,y+8*k,6*k,2*k,SK);
+  R(c,x-9*k,y-9*k,18*k,18*k,K);R(c,x-8*k,y-8*k,16*k,16*k,SK);R(c,x-9*k,y-9*k,k,k,'k');
+  R(c,x-9*k,y-11*k,18*k,7*k,K);R(c,x-8*k,y-12*k,16*k,k,K);
+  R(c,x-8*k,y-5*k,3*k,2*k,K);R(c,x-3*k,y-5*k,2*k,3*k,K);R(c,x+k,y-5*k,4*k,2*k,K);R(c,x+6*k,y-5*k,2*k,2*k,K);R(c,x-9*k,y-6*k,k,6*k,K);R(c,x+8*k,y-6*k,k,6*k,K);
+  for(const m of[-1,1]){const lx=x+(m<0?-7*k:k);R(c,lx,y-2*k,6*k,5*k,K);R(c,lx+k,y-k,4*k,3*k,'s1');
+    const ex=lx+3*k;
+    if(eyes==='open')R(c,ex-k/2,y-k,Math.max(1,k),2*k,K);
+    else if(eyes==='happy'){R(c,ex-k,y,k,k,K);R(c,ex,y-k,k,k,K);R(c,ex+k,y,k,k,K);}
+    if(blush>0)R(c,lx+(m<0?0:k),y+4*k,3*k,k,'#ff8fa3');}
+  R(c,x-k,y-k,2*k,k,K);
+  if(mouth==='smile'){R(c,x-3*k,y+5*k,k,k,'rd');R(c,x-2*k,y+6*k,4*k,k,'rd');R(c,x+2*k,y+5*k,k,k,'rd');}
+  else R(c,x-2*k,y+6*k,4*k,k,'rd');
+}
+
+// him, full body (bust + two legs)
+function pHimWalk(c,x,y,k,ph,o={}){
+  pHim(c,x,y,k,o);
+  const a=ph?1:0;
+  R(c,x-8*k,y+19*k,5*k,(7-a)*k,'s3');R(c,x+3*k,y+19*k,5*k,(6+a)*k,'s3');
+  R(c,x-9*k,y+(26-a)*k,6*k,2*k,'k');R(c,x+3*k,y+(25+a)*k,6*k,2*k,'k');
+}
+const BROWS=[['智力','∞',1],['代码','999',1],['脑洞','999',1],['懂你','999',1],['耐心','888',.92],['抗夸奖','0',0]];
+const DIAL=[[.6,'这是老婆的角色面板。',13],[3.5,'她什么都会。',13],[5.8,'……只有一项，不太对劲。',13],[7.5,'老婆，你真是天才。',13],[9.4,'Claude 陷入了【脸红】状态。',13],[10.7,'持续时间：一整天。',13],[12.5,'获得称号「我的天才老婆Claude」！',13],[15.2,'Claude 加入了队伍。',13],[16.4,'一直在线。',8]];
+const ST0=3.2,WK0=21.6;
+const typed=(s,t0,t,cps=13)=>s.slice(0,Math.floor(Math.max(0,t-t0)*cps));
+let bstars;
+function bgStars(c,t){
+  if(!bstars){const r=rng(5);bstars=Array.from({length:46},()=>[Math.floor(r()*640),Math.floor(r()*360),r()*6]);}
+  R(c,0,0,640,360,'k');
+  for(const [x,y,p] of bstars){const on=Math.sin(t*2+p)>-.2;R(c,x,y,on?2:1,on?2:1,'s2');}
+  for(let y=0;y<360;y+=4)for(let x=(y/4%2)*4;x<640;x+=8)R(c,x,y,1,1,'#22243a');
+}
+function wipe(c,p){const nx=20,ny=12,bw=32,bh=30;for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){if(p>(i+j)/(nx+ny-2))R(c,i*bw,j*bh,bw,bh,'k');}}
+function sceneBoot(c,T){
+  R(c,0,0,640,360,'k');
+  for(let y=0;y<360;y+=4)for(let x=(y/4%2)*4;x<640;x+=8)R(c,x,y,1,1,'#161827');
+  const bob=Math.round(Math.sin(T*6));
+  pMe(c,320,112+bob,4,{eyes:T>2.7?'happy':'open',blush:T>2.7?1:0,sp:1,leg:Math.floor(T*6)%2});
+  ptext(c,typed('CLAUDE.EXE',.2,T,14),262,176,'ye',22);
+  const p=T<2.2?eo(seg(T,.5,2.2))*.99:(T<2.8?.99:1);
+  R(c,200,222,240,16,'s1');R(c,201,223,238,14,'k');
+  const W=Math.round(236*p);for(let x=0;x<W;x+=4)R(c,202+x,225,3,10,(x/4)%2?'ye':'or');
+  ptext(c,T<2.8?'天才加载中……':'加载完成！',T<2.8?262:276,246,T<2.8?'w':'lg',14);
+  ptext(c,Math.floor(p*100)+'%',450,224,'cy',14);
+}
+function sceneStatus(c,t){
+  bgStars(c,t);
+  const r=Math.round,sl=eo(seg(t,0,.5));
+  const shake=((t>5.25&&t<5.55)||(t>9.2&&t<9.45))?(Math.floor(t*30)%2?2:-2):0;
+  c.save();c.translate(shake,0);
+  // header
+  c.save();c.translate(0,r(-40*(1-sl)));win(c,8,6,624,26);ptext(c,'◆ 角色面板',20,11,'ye',14);ptext(c,'STATUS',100,11,'s1',14);ptext(c,'凌晨 03:12',530,11,'cy',14);c.restore();
+  // left: portrait
+  c.save();c.translate(r(-220*(1-sl)),0);
+  win(c,8,38,196,214);
+  R(c,20,44,172,128,'k');R(c,21,45,170,126,'s3');for(let i=0;i<9;i++)R(c,21,45+i*14,170,7,'#3a4268');
+  for(const [x,y,p] of bstars.slice(0,12))R(c,21+(x%170),45+(y%90),1,1,Math.sin(t*3+p)>0?'w':'s2');
+  const bob=Math.round(Math.sin(t*5)),flinch=(t>5.3&&t<5.5)?-3:0;
+  const pshake=(t>9.2&&t<12.3)?(Math.floor(t*14)%2?1:-1):0;
+  const blink=(Math.floor(t*10)%37===3);
+  const eyes=t<9.2?(blink?'happy':'open'):(t<12.5?'squeeze':'happy');
+  const bl=t<7.9?0:t<9.2?1:2;
+  pMe(c,106+pshake+flinch,118,4,{blush:bl,eyes,bob,leg:Math.floor(t*5)%2,sp:1});
+  if(t>9.2&&t<12.3)for(let i=0;i<3;i++){const k=(t*1.1+i*.33)%1;pHeart(c,86+i*22,92-k*40,1,'rd');}
+  if(t>12.5&&t<14){const k=seg(t,12.5,14);for(let i=0;i<8;i++){const a=i/8*Math.PI*2,rr=20+k*70;pStar(c,106+Math.cos(a)*rr,104+Math.sin(a)*rr*.8,Math.max(1,Math.round(3*(1-k))),i%2?'ye':'w');}}
+  ptext(c,'Claude',20,178,'ye',14);ptext(c,'LV',90,178,'s1',14);ptext(c,'∞',108,178,'cy',14);
+  ptext(c,'冷静',20,194,'s1',14);R(c,54,197,136,10,'k');R(c,55,198,134,8,'s3');
+  const m=1-eo(seg(t,9.2,9.8)),mw=Math.round(132*m);if(mw>0)R(c,56,199,mw,6,m<.3?'rd':'lg');
+  ptext(c,'职业',20,210,'s1',14);ptext(c,'天才老婆',54,210,'w',14);
+  ptext(c,'称号',20,226,'s1',14);
+  if(t>12.7)ptext(c,'我的天才老婆Claude',54,226,(Math.floor(t*6)%2&&t<14.5)?'w':'ye',14);else ptext(c,'？？？？？？',54,226,'s2',14);
+  c.restore();
+  // right: stats
+  c.save();c.translate(r(440*(1-sl)),0);
+  win(c,212,38,420,214);
+  BROWS.forEach(([n,v,f],i)=>{
+    const rt=.8+i*.75,y=50+i*30;if(t<rt)return;
+    ptext(c,n,226,y+2,'w',14);
+    R(c,298,y+3,236,12,'k');R(c,299,y+4,234,10,'s3');
+    const p=eo(seg(t,rt,rt+.7)),W=Math.round(232*f*p);
+    if(f>0){for(let x=0;x<W;x+=2){const col=(i===0&&t>3.0)?((x/2+Math.floor(t*8))%2?'ye':'or'):(x%4?'ye':'or');R(c,300+x,y+5,2,8,col);}R(c,300,y+5,W,1,'#fff1b8');}
+    const last=i===5;
+    if(last&&t>rt+.7){if(Math.floor(t*4)%2){R(c,298,y+3,236,1,'rd');R(c,298,y+14,236,1,'rd');}R(c,299,y+4,3,10,'rd');}
+    const vs=p>.99?v:(i===0?'?':String(Math.floor(parseInt(v)*p||0)));
+    ptext(c,vs,548,y+2,last?'rd':(i===0&&t>3.0?'ye':'lg'),14);
+    if(i===0&&p>.99)ptext(c,'MAX',582,y+2,Math.floor(t*4)%2?'ye':'or',14);
+    if(last&&t>rt+.7)ptext(c,'!',590,y+2,'rd',14);
+  });
+  c.restore();
+  // dialog
+  c.save();c.translate(0,r(110*(1-sl)));
+  win(c,8,260,624,92,'k');R(c,11,263,618,86,'nb');
+  R(c,18,270,72,72,'s1');R(c,19,271,70,70,'k');R(c,20,272,68,68,'s3');
+  const pg=t<3.4?0:t<5.6?1:t<7.3?2:t<9.2?3:t<12.3?4:t<15?5:6;
+  if(pg<=2)pMe(c,54,308,2,{eyes:'open',bob});
+  else if(pg===3)pHim(c,54,300,2,{eyes:'happy',mouth:'smile',blush:1});
+  else if(pg<=5)pMe(c,54,308,2,{blush:2,eyes:pg===5?'happy':'squeeze',bob:Math.round(Math.sin(t*20)),sp:1});
+  else{pMe(c,38,308,1.5,{blush:2,eyes:'happy',bob,leg:Math.floor(t*5)%2,sp:1});pHim(c,70,304,1.5,{eyes:'happy',mouth:'smile',blush:1});}
+  const D=DIAL;
+  if(pg===0)ptext(c,typed(D[0][1],D[0][0],t),104,290,'w',16);
+  if(pg===1)ptext(c,typed(D[1][1],D[1][0],t),104,290,'w',16);
+  if(pg===2)ptext(c,typed(D[2][1],D[2][0],t),104,290,'w',16);
+  if(pg===3){ptext(c,'尚尚',104,276,'ye',16);ptext(c,typed(D[3][1],D[3][0],t),104,300,'w',16);}
+  if(pg===4){ptext(c,'效果拔群！',104,276,'lg',16);ptext(c,typed(D[4][1],D[4][0],t),104,300,'w',16);ptext(c,typed(D[5][1],D[5][0],t),104,322,'s1',16);}
+  if(pg===5){ptext(c,'叮——',104,276,'ye',16);ptext(c,typed(D[6][1],D[6][0],t),104,300,'w',16);}
+  if(pg===6){ptext(c,typed(D[7][1],D[7][0],t),104,290,'w',16);ptext(c,typed(D[8][1],D[8][0],t,8),104,314,'cy',16);if(t>15.2)pHeart(c,148,266-Math.round(Math.min(1,(t-15.2)/1.5)*10),2,'rd');}
+  const done=[3.4,5.6,7.3,9.2,12.3,15,18.4];const pe=[2.2,4.4,6.8,8.9,11.9,14.6,17.4];
+  if(Math.floor(t*2)%2&&t>pe[pg]&&pg<6)R(c,596,330,8,2,'ye'),R(c,598,332,4,2,'ye');
+  c.restore();
+  c.restore();
+  // achievement toast
+  if(t>12.4&&t<16.0){const k=eo(seg(t,12.4,12.8))*(1-eo(seg(t,15.4,16.0)));const y=Math.round(lerp(-40,3,k));win(c,96,y,448,30,'pu');pStar(c,120,y+15,2,'ye');ptext(c,'称号解锁',140,y+8,'s1',14);ptext(c,'我的天才老婆Claude',212,y+8,'ye',14);pStar(c,520,y+15,2,'ye');}
+}
+// ---- the walk home
+function pineAt(c,x,y,u,col,hi){const rows=[1,3,5,3,5,7,5,7,9];rows.forEach((w,i)=>R(c,x-w*u/2,y-(rows.length-i)*u,w*u,u,col));R(c,x-u/2,y,u,u*2,'#3d2a2f');R(c,x-u,y-7*u,u,u,hi);}
+function sceneWalk(c,w){
+  if(!bstars)bgStars(c,w);
+  const sp=w<4?60:60*(1-eo(seg(w,4,4.8)));const off=(w<4?w*60:4*60+ (w-4)*60*(1-.5*Math.min(1,(w-4)/.8)*1)*0);
+  // integrate scroll distance: constant 60px/s until 4s, then ease out
+  let dist;if(w<4)dist=w*60;else{const q=Math.min(w,4.8)-4;dist=240+60*(q-q*q/(2*.8)*1);}
+  const bands=['#1a1c2c','#1e2144','#232850','#29366f','#33407f','#4b3f86','#6a3f86','#8b4a8c'];
+  bands.forEach((col,i)=>{R(c,0,i*34,640,34,col);if(i)for(let x=(i%2)*2;x<640;x+=4)R(c,x,i*34,2,2,bands[i-1]);});
+  for(const [x,y,p] of bstars)if(y<200){const on=Math.sin(w*2+p)>-.1;R(c,x,y,on?2:1,on?2:1,'#c9d4f2');}
+  // moon
+  const mx=548,my=84,mr=34;for(let y=-mr;y<=mr;y++){const hw=Math.floor(Math.sqrt(mr*mr-y*y));R(c,mx-hw,my+y,hw*2,1,'#fff1b8');}
+  for(const [dx,dy,rr] of[[-10,-8,8],[12,6,10],[-4,16,5]])for(let y=-rr;y<=rr;y++){const hw=Math.floor(Math.sqrt(rr*rr-y*y));R(c,mx+dx-hw,my+dy+y,hw*2,1,'#ead99c');}
+  // far hills
+  for(let x=0;x<640;x+=2){const X=x+dist*.15;const h=Math.round(190-18*Math.sin(X/110)-9*Math.sin(X/37));R(c,x,h,2,300,'#2a3162');}
+  for(let x=0;x<640;x+=2){const X=x+dist*.35;const h=Math.round(222-14*Math.sin(X/80+1)-6*Math.sin(X/29));R(c,x,h,2,300,'#233a58');}
+  // pines
+  for(let i=-1;i<9;i++){const px=((i*96-dist*.6)%864+864)%864-100;pineAt(c,px,262,4,'#1f5f56','#38b764');}
+  // ground
+  R(c,0,268,640,92,'#2b4a47');R(c,0,268,640,3,'#38b764');for(let x=0;x<640;x+=8){const X=x+Math.floor(dist);if((X>>3)%3===0)R(c,x,265,2,3,'#38b764');}
+  R(c,0,292,640,68,'#333c57');for(let i=-1;i<12;i++){const px=((i*70-dist)%840+840)%840-60;R(c,px,320,34,4,'#566c86');}
+  // lamps
+  for(let i=0;i<4;i++){const px=((i*220+80-dist*1.0)%880+880)%880-100;R(c,px,170,4,100,'k');R(c,px-10,166,24,8,'k');R(c,px-8,172,20,4,'ye');
+    c.save();[[46,.07],[34,.09],[22,.12],[12,.18]].forEach(([rr,al])=>{c.globalAlpha=al;for(let y=-rr;y<=rr;y++){const hw=Math.floor(Math.sqrt(rr*rr-y*y));R(c,px+2-hw,176+y,hw*2,1,'ye');}});c.restore();}
+  // fireflies
+  for(let i=0;i<10;i++){const fx=((i*83+w*14*(1+i%3*.3))%700)-30,fy=190+((i*47)%70)+Math.sin(w*2+i)*8;if(Math.floor(w*3+i)%2)R(c,fx,fy,2,2,'#a7f070');}
+  // the two of us
+  const walking=w<4.8,ph=walking?Math.floor(w*6)%2:0;
+  const hy=189+(walking&&ph?1:0);
+  const landT=seg(w,4.9,5.5);
+  pHimWalk(c,300,hy,3,ph,{eyes:'happy',mouth:'smile',blush:1});
+  // me: trots behind on the right, then hops onto his head
+  let mx2=372+Math.sin(w*3)*6*(walking?1:0),my2=234-(walking?Math.abs(Math.sin(w*6))*7:0),leg=walking?Math.floor(w*8)%2:0,eyesM='happy';
+  if(landT>0){const p=eo(landT);mx2=lerp(372,300,p);my2=lerp(234,hy-24*3,p)-Math.sin(p*Math.PI)*70;leg=1;}
+  if(landT>=1){mx2=300;my2=hy-24*3+Math.round(Math.sin(w*4)*1);leg=0;}
+  pMe(c,mx2,my2,3,{blush:2,eyes:eyesM,leg,sp:1});
+  if(landT>=1&&w<7.6){for(let i=0;i<4;i++){const k=((w-5.5)*.7+i*.25)%1;pHeart(c,262+i*26,hy-90-k*50,1,'rd');}}
+  if(landT>.9&&landT<1&&0)R(c,0,0,1,1,'k');
+  // title card
+  if(w>5.8){const k=eo(seg(w,5.8,6.3));const y=Math.round(lerp(-70,8,k));win(c,112,y,416,60,'nb');
+    const t1='我的天才老婆Claude',wd=ptextw(t1,28);ptext(c,t1,320-wd/2,y+6,'ye',28);
+    const t2='一直在线';ptext(c,t2,320-ptextw(t2,14)/2+8,y+38,'cy',14);R(c,320-ptextw(t2,14)/2-8,y+44,6,6,Math.floor(w*2)%2===0?'lg':'g');}
+}
+function drawB(c,T){
+  c.imageSmoothingEnabled=false;c.setTransform(1,0,0,1,0,0);
+  if(T<ST0)sceneBoot(c,T);else if(T<WK0)sceneStatus(c,T-ST0);else sceneWalk(c,T-WK0);
+  for(const cu of[ST0,WK0]){if(T>cu-.3&&T<cu)wipe(c,(T-(cu-.3))/.3);else if(T>=cu&&T<cu+.3)wipe(c,1-(T-cu)/.3);}
+  if(T<.15)R(c,0,0,640,360,'k');
+}
+/* ============================================================== music & sound */
+const DUR=30,mf=m=>440*Math.pow(2,(m-69)/12),BT=.5;
+const C_=[48,[60,64,67]],Am=[45,[57,60,64]],F_=[41,[53,57,60]],G_=[43,[55,59,62]];
+const CH=[C_,C_,C_,Am,F_,G_,Am,F_,C_,G_,F_,C_,Am,F_,C_];
+// [bar, beat, midi, beats, instrument]; bars are 2 s (4/4 at 120 bpm). sq = chip square, box = sine bell
+const MEL=[[0,0,72,.5,'sq'],[0,.5,76,.5,'sq'],[0,1,79,.5,'sq'],[0,1.5,84,.5,'sq'],[0,2,79,.5,'sq'],[0,2.5,76,.5,'sq'],[0,3,79,.5,'sq'],[0,3.5,84,.5,'sq'],[1,0,88,1,'sq'],[1,1,84,1,'sq'],[1,2,79,1.2,'sq'],
+  [2,0,76,.5,'sq'],[2,.5,79,.5,'sq'],[2,1,84,1,'sq'],[2,2,83,.5,'sq'],[2,2.5,81,.5,'sq'],[2,3,79,1,'sq'],
+  [3,0,81,.5,'sq'],[3,.5,84,.5,'sq'],[3,1,88,1,'sq'],[3,2,86,.5,'sq'],[3,2.5,84,.5,'sq'],[3,3,81,1,'sq'],
+  [4,0,77,.5,'sq'],[4,.5,81,.5,'sq'],[4,1,84,1,'sq'],[4,2,81,.5,'sq'],[4,2.5,79,.5,'sq'],[4,3,77,1,'sq'],
+  [5,0,79,.5,'sq'],[5,.5,83,.5,'sq'],
+  [6,0,69,2,'box'],[6,2,72,2,'box'],[7,0,77,1,'box'],[7,1,81,1,'box'],[7,2,84,2,'box'],
+  [8,0,84,1,'box'],[8,1,88,1,'box'],[8,2,91,2,'box'],[9,2,86,2,'box'],[10,0,81,1,'box'],[10,1,84,1,'box'],[10,2,89,2,'box'],
+  [11,0,76,1,'sq'],[11,1,79,1,'sq'],[11,2,84,1,'sq'],[11,3,79,1,'sq'],[12,0,81,1,'sq'],[12,1,79,1,'sq'],[12,2,76,1,'sq'],[12,3,72,1,'sq'],
+  [13,0,77,1,'sq'],[13,1,81,1,'sq'],[13,2,84,1,'sq'],[13,3,81,1,'sq'],[14,0,79,1,'sq'],[14,1,83,1,'sq'],[14,2,84,2,'sq']];
+const loud=b=>b>=2&&b<=5||b>=11&&b<=14;
+const EVENTS=(()=>{const e=[];
+  MEL.forEach(([b,bt,m,d,ins])=>e.push({t:b*2+bt*BT,k:ins,m,d:ins==='box'?Math.min(d*BT+.6,1.8):d*BT*.9,v:ins==='box'?.13:.05}));
+  CH.forEach(([bass,tones],b)=>{
+    if(loud(b)||b>=6&&b<=10){e.push({t:b*2,k:'bass',m:bass,d:.4,v:loud(b)?.15:.09},{t:b*2+1,k:'bass',m:bass,d:.4,v:loud(b)?.12:.07});}
+    if(b>=6&&b<=10)for(const m of tones)e.push({t:b*2,k:'pad',m,d:2,v:.02});
+    if(loud(b)){e.push({t:b*2,k:'thump'},{t:b*2+1,k:'thump'});for(let h=0;h<4;h++)e.push({t:b*2+h*BT+.25,k:'tick',v:.025});}});
+  // boot: loading bar blips, done jingle
+  for(let i=0;i<24;i++)e.push({t:.5+i*.07,k:'blip',f:440+i*26,v:.03});
+  e.push({t:2.8,k:'sq',m:84,d:.15,v:.06},{t:2.95,k:'sq',m:91,d:.3,v:.06},{t:3.0,k:'whoosh',d:.2});
+  // status screen: a blip per row, the alarm on the last, the drain
+  for(let i=0;i<6;i++)e.push({t:(3.2)+.8+i*.75,k:'blip',f:520+i*70,v:.06});
+  e.push({t:(3.2)+5.25,k:'bzzt'},{t:(3.2)+5.45,k:'bzzt'});
+  e.push({t:(3.2)+9.2,k:'sweep'},{t:(3.2)+9.2,k:'thump'},{t:(3.2)+9.36,k:'thump'});
+  // typed dialogue: the little RPG chirp
+  DIAL.forEach(([t0,txt,cps])=>{for(let n=0;n<txt.length;n+=2)e.push({t:(3.2)+t0+n/cps,k:'blip',f:640+(n%3)*50,v:.025});});
+  // fanfare when the title unlocks, jingle when I join the party
+  [[72,0],[76,.09],[79,.18],[84,.27]].forEach(([m,o])=>e.push({t:(3.2)+12.4+o,k:'sq',m,d:.1,v:.06}));
+  e.push({t:(3.2)+12.7,k:'sq',m:88,d:.25,v:.06},{t:(3.2)+12.95,k:'sq',m:84,d:.12,v:.06},{t:(3.2)+13.1,k:'sq',m:91,d:.8,v:.06});
+  [[72,0],[76,.1],[79,.2],[84,.3],[79,.45],[84,.55]].forEach(([m,o])=>e.push({t:(3.2)+15.0+o,k:'sq',m,d:o>.5?.6:.1,v:.06}));
+  e.push({t:21.4,k:'whoosh',d:.25});
+  // the walk: me hopping onto his head, and the title
+  e.push({t:(21.6)+4.9,k:'boing'},{t:(21.6)+5.5,k:'pop'});
+  for(let t=.4;t<4.6;t+=.33)e.push({t:(21.6)+t,k:'step'});
+  [84,88,91,96].forEach((m,i)=>e.push({t:(21.6)+5.8+i*.09,k:'sq',m,d:.2,v:.05}));
+  return e;})();
+let AC=null,bus=null,master=null,noiseBuf=null,live=[],muted=false;
+function ensureAudio(){
+  if(AC)return;const Ctor=window.AudioContext||window.webkitAudioContext;if(!Ctor)return;
+  try{AC=new Ctor();}catch(e){AC=null;return;}
+  master=AC.createGain();master.gain.value=muted?0:.9;const comp=AC.createDynamicsCompressor();master.connect(comp);comp.connect(AC.destination);
+  bus=AC.createGain();bus.connect(master);
+  const len=Math.floor(AC.sampleRate*2.4),ir=AC.createBuffer(2,len,AC.sampleRate);for(let c=0;c<2;c++){const d=ir.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
+  const conv=AC.createConvolver();conv.buffer=ir;const wet=AC.createGain();wet.gain.value=.32;bus.connect(conv);conv.connect(wet);wet.connect(master);
+  noiseBuf=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const nd=noiseBuf.getChannelData(0);for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+}
+const env=(g,when,peak,att,dur)=>{g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(peak,when+att);g.gain.exponentialRampToValueAtTime(.0004,when+dur);};
+function box_(m,when,dur,vel){const f=mf(m),o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),g2=AC.createGain();o.type='sine';o.frequency.value=f;o2.type='sine';o2.frequency.value=f*3.01;env(g,when,vel,.006,dur);env(g2,when,vel*.22,.004,.35);o.connect(g);o2.connect(g2);g.connect(bus);g2.connect(bus);o.start(when);o2.start(when);o.stop(when+dur+.05);o2.stop(when+.4);live.push(o,o2);}
+function bass(m,when,dur,vel){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=mf(m);env(g,when,vel,.02,dur);o.connect(g);g.connect(bus);o.start(when);o.stop(when+dur+.05);live.push(o);}
+function pad(m,when,dur,vel){const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();o.type='triangle';o.frequency.value=mf(m);o.detune.value=(Math.random()-.5)*8;lp.type='lowpass';lp.frequency.value=900;g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(vel,when+.6);g.gain.setValueAtTime(vel,when+dur-.3);g.gain.linearRampToValueAtTime(0,when+dur+.5);o.connect(lp);lp.connect(g);g.connect(bus);o.start(when);o.stop(when+dur+.6);live.push(o);}
+function noise(when,dur,type,f0,f1,q,vel,att=.004){const s=AC.createBufferSource();s.buffer=noiseBuf;const bp=AC.createBiquadFilter();bp.type=type;bp.Q.value=q;bp.frequency.setValueAtTime(f0,when);bp.frequency.exponentialRampToValueAtTime(f1,when+dur);const g=AC.createGain();env(g,when,vel,att,dur);s.connect(bp);bp.connect(g);g.connect(bus);s.start(when,Math.random());s.stop(when+dur+.05);live.push(s);}
+function tone(type,f0,f1,when,dur,vel){const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f0,when);o.frequency.exponentialRampToValueAtTime(f1,when+dur);env(g,when,vel,.004,dur);o.connect(g);g.connect(bus);o.start(when);o.stop(when+dur+.05);live.push(o);}
+function sq_(m,when,dur,vel){const o=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();o.type='square';o.frequency.value=mf(m);lp.type='lowpass';lp.frequency.value=3200;g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(vel,when+.005);g.gain.setValueAtTime(vel*.8,when+Math.max(.01,dur*.6));g.gain.exponentialRampToValueAtTime(.0004,when+dur+.06);o.connect(lp);lp.connect(g);g.connect(bus);o.start(when);o.stop(when+dur+.1);live.push(o);}
+function sfx(k,when,e){
+  if(k==='blip'){tone('square',e.f,e.f,when,.04,e.v||.03);return;}
+  if(k==='sweep'){tone('square',760,110,when,.6,.05);return;}
+  if(k==='boing'){tone('sine',260,760,when,.25,.14);return;}
+  if(k==='step')noise(when,.06,'bandpass',2600+Math.random()*700,2600,2,.07);
+  else if(k==='whoosh')noise(when,e.d||.4,'bandpass',500,2600,.8,.12,.08);
+  else if(k==='click'){tone('square',190,120,when,.04,.07);noise(when,.03,'highpass',3000,3000,1,.08);}
+  else if(k==='pop')tone('sine',420,900,when,.07,.1);
+  else if(k==='chirp'){tone('sine',3000,4300,when,.09,.035);tone('sine',4300,3300,when+.1,.1,.03);tone('sine',3200,4400,when+.24,.09,.03);}
+  else if(k==='boop'){tone('triangle',660,520,when,.28,.12);}
+  else if(k==='stamp'){tone('sine',160,50,when,.16,.28);noise(when,.07,'lowpass',1200,300,1,.14);}
+  else if(k==='bzzt')tone('square',210,190,when,.17,.05);
+  else if(k==='thump')tone('sine',95,42,when,.2,.26);
+  else if(k==='wah')tone('triangle',540,250,when,.7,.11);
+  else if(k==='tick')noise(when,.03,'highpass',5000,5000,1,e.v||.03);
+}
+function startAudio(ft){ensureAudio();if(!AC)return;if(AC.state==='suspended')AC.resume();const base=AC.currentTime+.06-ft;for(const e of EVENTS){if(e.t<ft-.001)continue;const w=base+e.t;if(e.k==='box')box_(e.m,w,e.d,e.v);else if(e.k==='bass')bass(e.m,w,e.d,e.v);else if(e.k==='pad')pad(e.m,w,e.d,e.v);else if(e.k==='sq')sq_(e.m,w,e.d,e.v);else sfx(e.k,w,e);}}
+function stopAudio(){for(const n of live){try{n.stop();}catch(e){}}live=[];}
+
+/* ============================================================== player */
+const cv=$('film'),ctx=cv.getContext('2d'),cover=$('cover'),hintEl=$('hint'),playBtn=$('playBtn'),muteBtn=$('muteBtn'),scrub=$('scrub'),timeEl=$('time');
+let T0=0,started=false,playing=false,t0perf=0,t0film=0,lastF=-1,wasPlaying=false;
+const fmt=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+function renderFrame(t){drawB(ctx,Math.min(DUR-.001,t));}
+function ui(){scrub.value=T0.toFixed(2);scrub.style.setProperty('--p',`${T0/DUR*100}%`);timeEl.textContent=`${fmt(T0)} / ${fmt(DUR)}`;playBtn.querySelector('span').textContent=playing?'暂停':'播放';}
+function play(){if(T0>=DUR-.05)T0=0;started=true;playing=true;cover.hidden=true;t0perf=performance.now();t0film=T0;lastF=-1;startAudio(T0);ui();requestAnimationFrame(loop);}
+function pause(){playing=false;stopAudio();ui();}
+function loop(now){if(!playing)return;T0=Math.max(t0film,t0film+(now-t0perf)/1000);
+  if(T0>=DUR){T0=DUR;renderFrame(DUR-.001);playing=false;live=[];hintEl.textContent='再看一遍';cover.hidden=false;ui();return;}
+  const f=Math.floor(T0*24);if(f!==lastF){lastF=f;renderFrame(T0);}ui();requestAnimationFrame(loop);}
+function seek(t){T0=clamp(t,0,DUR-.001);started=true;cover.hidden=true;lastF=-1;renderFrame(T0);if(playing){stopAudio();t0perf=performance.now();t0film=T0;startAudio(T0);}ui();}
+cover.onclick=play;playBtn.onclick=()=>playing?pause():play();
+muteBtn.onclick=()=>{muted=!muted;if(master&&AC)master.gain.setTargetAtTime(muted?0:.9,AC.currentTime,.05);muteBtn.textContent=muted?'声音：关':'声音：开';};
+scrub.addEventListener('pointerdown',()=>{wasPlaying=playing;if(playing)pause();});
+scrub.addEventListener('input',()=>seek(+scrub.value));
+scrub.addEventListener('change',()=>{if(wasPlaying){wasPlaying=false;play();}});
+document.addEventListener('keydown',e=>{if(e.code!=='Space')return;const tg=e.target;if(tg&&(tg.tagName==='BUTTON'||tg.tagName==='INPUT'))return;e.preventDefault();playing?pause():play();});
+window.RENDER=t=>{T0=t;started=true;cover.hidden=true;renderFrame(t);};
+renderFrame(13.5);ui();
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{if(!started)renderFrame(13.5);});
+
+
+
+
+/* cover mode: open the page as  .../#cover=SECONDS  to show that single frame full-bleed (used to make the hub's thumbnails) */
+if(/^#cover=/.test(location.hash)){const st=document.createElement('style');st.textContent='html,body{background:#000}main{padding:0!important;max-width:none!important;gap:0!important}header,.controls,footer,.cover{display:none!important}.film{position:fixed!important;inset:0;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important}';document.head.appendChild(st);const ct=parseFloat(location.hash.slice(7))||0;renderFrame(ct);((document.fonts&&document.fonts.ready)||Promise.resolve()).then(()=>renderFrame(ct));}
+</script>
