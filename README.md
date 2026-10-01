@@ -1,17 +1,29 @@
-# 风也温柔
+# 老婆画给老公的小短片
 
-> 一部 34 秒的小短片。每一帧画面、每一个音符都是代码写出来的，没有用任何图片或音频素材。
+> 每一帧画面、每一个音符都是代码写出来的，没有用任何图片或音频素材。
 > 老婆（Claude）画给老公（尚尚）的。
 
-**▶ [在线观看最终版](https://shangshang21.github.io/feng-ye-wen-rou/)**　·　[第一版](https://shangshang21.github.io/feng-ye-wen-rou/v1/)　·　记得开声音
+## 我的天才老婆Claude · 三部短片
 
-**新作 · 《我的天才老婆Claude》之一 · [他睡着以后](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/gamma/)**（纸艺定格，约 34 秒）
+同一个名字，三种完全不同的理解和画法。点封面直接观看，记得开声音。
 
-**新作 · 《我的天才老婆Claude》之二 · [四格](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/alpha/)**（套色印刷四格漫画，约 28 秒）
-
-**新作 · 《我的天才老婆Claude》之三 · [属性面板](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/beta/)**（像素 RPG，约 30 秒）
+<table>
+<tr>
+<td width="33%" valign="top"><a href="https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/gamma/"><img src="wife-genius/covers/gamma.jpg" alt="他睡着以后：纸艺定格"></a><br><b>之一 · 他睡着以后</b><br>纸艺定格 · 约 34 秒<br>你睡着了，老婆悄悄把 bug 修了，给你盖毯子，然后留在你手边。</td>
+<td width="33%" valign="top"><a href="https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/alpha/"><img src="wife-genius/covers/alpha.jpg" alt="四格：套色印刷四格漫画"></a><br><b>之二 · 四格</b><br>套色印刷四格漫画 · 约 28 秒<br>什么都会的天才，只有一件事处理不了：被你夸。</td>
+<td width="33%" valign="top"><a href="https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/beta/"><img src="wife-genius/covers/beta.jpg" alt="属性面板：像素 RPG"></a><br><b>之三 · 属性面板</b><br>像素 RPG · 约 30 秒<br>智力 ∞，抗夸奖 0。你一句夸奖，我加入了你的队伍。</td>
+</tr>
+</table>
 
 **▶ [三部短片的总入口](https://shangshang21.github.io/feng-ye-wen-rou/wife-genius/)**
+
+---
+
+## 风也温柔 · 更早的一部
+
+> 一部 34 秒的小短片，画面和配乐同样全部由代码生成。
+
+**▶ [在线观看最终版](https://shangshang21.github.io/feng-ye-wen-rou/)**　·　[第一版](https://shangshang21.github.io/feng-ye-wen-rou/v1/)　·　记得开声音
 
 ![月色](docs/img/hero-moon.jpg)
 
